@@ -1,9 +1,14 @@
 package com.fawry.intern.couponservice.coupon;
 
 
+import com.fawry.intern.couponservice.coupon_history.CouponHistoryRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.sql.Date;
+import java.util.Optional;
 
 
 @RestController
@@ -11,8 +16,13 @@ import org.springframework.web.bind.annotation.*;
 public class CouponController {
 
     private final CouponService couponService;
-    public CouponController(CouponService couponService) {
+    private final CouponHistoryRepository couponHistoryRepository;
+    private final CouponRepository couponRepository;
+
+    public CouponController(CouponService couponService, CouponHistoryRepository couponHistoryRepository, CouponRepository couponRepository) {
         this.couponService = couponService;
+        this.couponHistoryRepository = couponHistoryRepository;
+        this.couponRepository = couponRepository;
     }
 
     @GetMapping
@@ -43,13 +53,33 @@ public class CouponController {
     }
 
     @PostMapping("/consume")
-    public CouponResponse consumeCoupon(@RequestBody CouponRequestBody request) {
-        return couponService.consume(request);
+    public ResponseEntity<CouponResponse> consumeCoupon(@RequestBody CouponRequestBody request) {
+        CouponResponse couponResponse =  couponService.consume(request);
+
+        if(couponResponse.status().equalsIgnoreCase("Fail")){
+            return ResponseEntity.badRequest().body(couponResponse);
+        }
+        return ResponseEntity.ok(couponResponse);
     }
 
     @PostMapping("/validate")
-    public CouponResponse validateCoupon(@RequestBody CouponRequestBody request) {
-        return couponService.validate(request);
+    public ResponseEntity<CouponResponse> validateCoupon(@RequestBody CouponRequestBody request) {
+        CouponResponse couponResponse =  couponService.validate(request);
+        if(couponResponse.status().equalsIgnoreCase("Fail")){
+            return ResponseEntity.badRequest().body(couponResponse);
+        }
+        return ResponseEntity.ok(couponResponse);
+    }
+    @PostMapping("/unconsume/{transactionId}")
+    public ResponseEntity<CouponResponse> unconsume(@PathVariable String transactionId){
+        System.out.println(transactionId);
+        CouponResponse couponResponse = couponService.unconsume(transactionId);
+
+        if(couponResponse.status().equalsIgnoreCase("Fail")){
+            return ResponseEntity.badRequest().body(couponResponse);
+        }
+        return ResponseEntity.ok(couponResponse);
+
     }
 
 

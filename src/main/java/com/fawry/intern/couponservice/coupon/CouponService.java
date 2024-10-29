@@ -4,6 +4,7 @@ import com.fawry.intern.couponservice.coupon_history.CouponHistory;
 import com.fawry.intern.couponservice.coupon_history.CouponHistoryRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
@@ -23,7 +24,6 @@ public class CouponService {
     }
 
     public Page<Coupon> getAllCoupons(Pageable pageable) {
-        
         return couponRepository.findAll(pageable);
     }
 
@@ -33,10 +33,6 @@ public class CouponService {
     }
 
     public Coupon addCoupon(Coupon coupon) {
-        System.out.println(coupon.getCode());
-        System.out.println(coupon.getNumberOfUsages());
-        System.out.println(coupon.getExpiryDate());
-
         return couponRepository.save(coupon);
     }
     public Coupon updateCoupon(Long id, Coupon newCoupon) {
@@ -96,6 +92,8 @@ public class CouponService {
                     return new CouponResponse("Fail", request.amount(),
                             "Coupon can not bee applied for this order");
                 }
+                coupon.setAvailableUsages(coupon.getAvailableUsages()-1);
+                couponRepository.save(coupon);
                 CouponHistory couponHistory = new CouponHistory();
                 couponHistory.setCode(coupon.getCode());
                 couponHistory.setOrderId(request.orderId());
@@ -103,6 +101,7 @@ public class CouponService {
                 couponHistory.setValueAfterDiscount(valueAfterDiscount);
                 couponHistory.setConsumptionDate(Date.valueOf(LocalDate.now()));
                 couponHistoryRepository.save(couponHistory);
+
                 return new CouponResponse("Success", valueAfterDiscount,
                         "this order is sufficient to get the coupon");
             }else{
@@ -164,4 +163,43 @@ public class CouponService {
     }
 
 
+    public CouponResponse unconsume(String orderId) {
+        Optional<CouponHistory> requiredCouponHistory = couponHistoryRepository.findByOrderId(orderId);
+
+        if(requiredCouponHistory.isEmpty()){
+            return new CouponResponse("Fail", 0,
+                    "History of this transactionId \"" + orderId + "\" does not exist");
+        }
+        else
+        {
+            CouponHistory couponHistory= requiredCouponHistory.get();
+            Optional<Coupon> requiredCoupon = couponRepository.findByCode(couponHistory.getCode());
+            if (requiredCoupon.isEmpty()) {
+                double discount = couponHistory.getValueBeforeDiscount() - couponHistory.getValueAfterDiscount();
+                CouponType couponType;
+                int value = (int) discount;
+                if(couponHistory.getValueBeforeDiscount() == couponHistory.getValueAfterDiscount() + 0.01 * discount*couponHistory.getValueBeforeDiscount()){
+                    couponType = CouponType.PERCENTAGE;
+                }
+                else{
+                    couponType = CouponType.FIXED;
+                }
+
+                couponRepository.save(new Coupon(couponHistory.getCode(),
+                        1,
+                        1,
+                        Date.valueOf(LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonthValue()+1, LocalDate.now().getDayOfMonth())),
+                        couponType, true, value));
+            }else{
+                Coupon coupon = requiredCoupon.get();
+                coupon.setActive(true);
+                coupon.setAvailableUsages(coupon.getAvailableUsages()+1);
+                couponRepository.save(coupon);
+            }
+
+            couponHistoryRepository.delete(couponHistory);
+            return new CouponResponse("Success", 0, "this Coupon is unconsumed successfully");
+
+        }
+    }
 }
