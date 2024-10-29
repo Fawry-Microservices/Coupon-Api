@@ -33,7 +33,7 @@ public class CouponController {
 
     @PostMapping
     public Coupon addCoupon(@RequestBody Coupon coupon) {
-        System.out.println(coupon);
+        System.out.println("Coupon to be added is: " + coupon);
         return couponService.addCoupon(coupon);
     }
 

@@ -81,25 +81,25 @@ public class CouponService {
 
 
     public CouponResponse consume(CouponRequestBody request) {
-        Optional<Coupon> requiredCoupon = couponRepository.findByCode(request.code());
+        Optional<Coupon> requiredCoupon = couponRepository.findByCode(request.couponCode());
         if (requiredCoupon.isPresent()) {
             Coupon coupon = requiredCoupon.get();
             if (coupon.isActive() && coupon.getAvailableUsages() > 0) {
                 double couponValue = coupon.getValue();
                 double valueAfterDiscount;
                 if(coupon.getType() == CouponType.PERCENTAGE){
-                    valueAfterDiscount = request.value() - (0.01 * couponValue * request.value());
+                    valueAfterDiscount = request.amount() - (0.01 * couponValue * request.amount());
                 }else
-                    valueAfterDiscount = request.value() - couponValue;
+                    valueAfterDiscount = request.amount() - couponValue;
 
                 if(valueAfterDiscount <= 100){
-                    return new CouponResponse("Fail", request.value(),
+                    return new CouponResponse("Fail", request.amount(),
                             "Coupon can not bee applied for this order");
                 }
                 CouponHistory couponHistory = new CouponHistory();
                 couponHistory.setCode(coupon.getCode());
                 couponHistory.setOrderId(request.orderId());
-                couponHistory.setValueBeforeDiscount(request.value());
+                couponHistory.setValueBeforeDiscount(request.amount());
                 couponHistory.setValueAfterDiscount(valueAfterDiscount);
                 couponHistory.setConsumptionDate(Date.valueOf(LocalDate.now()));
                 couponHistoryRepository.save(couponHistory);
@@ -107,37 +107,37 @@ public class CouponService {
                         "this order is sufficient to get the coupon");
             }else{
                 if(!coupon.isActive()){
-                    return new CouponResponse("Fail", request.value(), "this coupon " + request.code() + " is not active");
+                    return new CouponResponse("Fail", request.amount(), "this coupon " + request.couponCode() + " is not active");
                 }
                 if(coupon.getAvailableUsages() == 0){
-                    Optional<Coupon> coupon1 = couponRepository.findByCode(request.code());
+                    Optional<Coupon> coupon1 = couponRepository.findByCode(request.couponCode());
                     if(coupon1.isPresent()){
                         Coupon coupon2 = coupon1.get();
                         coupon2.setActive(false);
                         couponRepository.save(coupon2);
                     }
-                    return new CouponResponse("Fail", request.value(),
-                            "this coupon " + request.code() + " is not available");
+                    return new CouponResponse("Fail", request.amount(),
+                            "this coupon " + request.couponCode() + " is not available");
                 }
             }
         }
-        return new CouponResponse("Fail", request.value() ,
-                "this coupon " + request.code()  + " is not existed");
+        return new CouponResponse("Fail", request.amount() ,
+                "this coupon " + request.couponCode()  + " is not existed");
     }
     public CouponResponse validate(CouponRequestBody request) {
-        Optional<Coupon> requiredCoupon = couponRepository.findByCode(request.code());
+        Optional<Coupon> requiredCoupon = couponRepository.findByCode(request.couponCode());
         if (requiredCoupon.isPresent()) {
             Coupon coupon = requiredCoupon.get();
             if (coupon.isActive() && coupon.getAvailableUsages() > 0) {
                 double couponValue = coupon.getValue();
                 double valueAfterDiscount;
                 if(coupon.getType() == CouponType.PERCENTAGE){
-                    valueAfterDiscount = request.value() - (0.01 * couponValue * request.value());
+                    valueAfterDiscount = request.amount() - (0.01 * couponValue * request.amount());
                 }else
-                    valueAfterDiscount = request.value() - couponValue;
+                    valueAfterDiscount = request.amount() - couponValue;
 
                 if(valueAfterDiscount <= 100){
-                    return new CouponResponse("Fail", request.value(),
+                    return new CouponResponse("Fail", request.amount(),
                             "Coupon can not bee applied for this order");
                 }
 
@@ -145,22 +145,22 @@ public class CouponService {
                         "this order is sufficient to get the coupon");
             }else{
                 if(!coupon.isActive()){
-                    return new CouponResponse("Fail", request.value(), "this coupon " + request.code() + " is not active");
+                    return new CouponResponse("Fail", request.amount(), "this coupon " + request.couponCode() + " is not active");
                 }
                 if(coupon.getAvailableUsages() == 0){
-                    Optional<Coupon> coupon1 = couponRepository.findByCode(request.code());
+                    Optional<Coupon> coupon1 = couponRepository.findByCode(request.couponCode());
                     if(coupon1.isPresent()){
                         Coupon coupon2 = coupon1.get();
                         coupon2.setActive(false);
                         couponRepository.save(coupon2);
                     }
-                    return new CouponResponse("Fail", request.value(),
-                            "this coupon " + request.code() + " is not available");
+                    return new CouponResponse("Fail", request.amount(),
+                            "this coupon " + request.couponCode() + " is not available");
                 }
             }
         }
-        return new CouponResponse("Fail", request.value() ,
-                "this coupon " + request.code()  + " is not existed");
+        return new CouponResponse("Fail", request.amount() ,
+                "this coupon " + request.couponCode()  + " is not existed");
     }
 
 
