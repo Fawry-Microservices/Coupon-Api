@@ -33,6 +33,19 @@ public class Coupon {
         @Column
         private double value;
 
+    public Coupon() {
+    }
+
+    public Coupon(String code, int numberOfUsages, int availableUsages, Date expiryDate, CouponType type, boolean active, double value) {
+        this.code = code;
+        this.numberOfUsages = numberOfUsages;
+        this.availableUsages = availableUsages;
+        this.expiryDate = expiryDate;
+        this.type = type;
+        this.active = active;
+        this.value = value;
+    }
+
     public Long getId() {
         return id;
     }
