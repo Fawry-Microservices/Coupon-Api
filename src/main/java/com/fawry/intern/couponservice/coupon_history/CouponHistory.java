@@ -15,7 +15,7 @@ public class CouponHistory {
     }
     public CouponHistory(int id,
                          String code,
-                         int orderId,
+                         String orderId,
                          double valueBeforeDiscount,
                          double valueAfterDiscount,
                          Date consumptionDate) {
@@ -34,8 +34,8 @@ public class CouponHistory {
     @Column(nullable = false)
     private String code;
 
-    @Column(name = "order_id", nullable = false)
-    private int orderId;
+    @Column(name = "order_id", nullable = false, unique = true)
+    private String orderId;
 
     @Column(nullable = false, name = "value_before_discount")
     private double valueBeforeDiscount;
@@ -64,11 +64,11 @@ public class CouponHistory {
         this.code = code;
     }
 
-    public int getOrderId() {
+    public String getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(int orderId) {
+    public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
 
