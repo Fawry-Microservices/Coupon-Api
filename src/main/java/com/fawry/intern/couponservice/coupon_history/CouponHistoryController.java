@@ -21,5 +21,4 @@ public class CouponHistoryController {
         return couponHistoryService.getAll(pageable);
     }
 
-
 }

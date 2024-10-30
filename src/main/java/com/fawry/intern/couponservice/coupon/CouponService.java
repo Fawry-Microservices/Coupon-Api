@@ -33,6 +33,7 @@ public class CouponService {
     }
 
     public Coupon addCoupon(Coupon coupon) {
+        coupon.setAvailableUsages(coupon.getNumberOfUsages());
         return couponRepository.save(coupon);
     }
     public Coupon updateCoupon(Long id, Coupon newCoupon) {
@@ -92,8 +93,6 @@ public class CouponService {
                     return new CouponResponse("Fail", request.amount(),
                             "Coupon can not bee applied for this order");
                 }
-                coupon.setAvailableUsages(coupon.getAvailableUsages()-1);
-                couponRepository.save(coupon);
                 CouponHistory couponHistory = new CouponHistory();
                 couponHistory.setCode(coupon.getCode());
                 couponHistory.setOrderId(request.orderId());
@@ -101,6 +100,10 @@ public class CouponService {
                 couponHistory.setValueAfterDiscount(valueAfterDiscount);
                 couponHistory.setConsumptionDate(Date.valueOf(LocalDate.now()));
                 couponHistoryRepository.save(couponHistory);
+                coupon.setAvailableUsages(coupon.getAvailableUsages()-1);
+                couponRepository.save(coupon);
+
+
 
                 return new CouponResponse("Success", valueAfterDiscount,
                         "this order is sufficient to get the coupon");

@@ -17,6 +17,7 @@ public class CouponHistoryService {
     public Page<CouponHistory> getAll(Pageable pageable) {
         return couponHistoryRepository.findAll(pageable);
     }
+
     public CouponHistory get(Long id) {
         return couponHistoryRepository.findById(id).orElse(null);
     }

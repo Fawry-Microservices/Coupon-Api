@@ -16,19 +16,16 @@ import java.util.Optional;
 public class CouponController {
 
     private final CouponService couponService;
-    private final CouponHistoryRepository couponHistoryRepository;
-    private final CouponRepository couponRepository;
 
     public CouponController(CouponService couponService, CouponHistoryRepository couponHistoryRepository, CouponRepository couponRepository) {
         this.couponService = couponService;
-        this.couponHistoryRepository = couponHistoryRepository;
-        this.couponRepository = couponRepository;
     }
 
     @GetMapping
     public Page<Coupon> getAllCoupons(Pageable pageable) {
         return couponService.getAllCoupons(pageable);
     }
+
     @GetMapping("/{id}")
     public Coupon getSpecificCoupons(@PathVariable Long id) {
         return couponService.getSpecificCoupon(id);
@@ -43,7 +40,7 @@ public class CouponController {
 
     @PostMapping
     public Coupon addCoupon(@RequestBody Coupon coupon) {
-        System.out.println("Coupon to be added is: " + coupon);
+        System.out.println("Coupon to be added is: " + coupon.getCode());
         return couponService.addCoupon(coupon);
     }
 
