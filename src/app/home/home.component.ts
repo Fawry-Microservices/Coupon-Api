@@ -1,11 +1,11 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component } from '@angular/core';
 import { CouponsService } from '../services/coupons.service';
-import { Coupon, Coupons } from '../../types';
+import { Coupon } from '../../types';
 import { CouponComponent } from '../components/coupon/coupon.component';
 import { CommonModule } from '@angular/common';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
-import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
+import { HttpParams } from '@angular/common/http';
 
 
 @Component({
