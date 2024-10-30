@@ -1,0 +1,27 @@
+<form [formGroup]="couponForm" (ngSubmit)="onSubmit()">
+    <label for="code">Code</label>
+    <input id="code" formControlName="code" type="text" required />
+
+    <label for="numberOfUsages">Number of Usages</label>
+    <input id="numberOfUsages" formControlName="numberOfUsages" type="number" required />
+
+    <label for="expiryDate">Expiry Date</label>
+    <input id="expiryDate" formControlName="expiryDate" type="date" required />
+
+    <label for="type">Type</label>
+    <select id="type" formControlName="type" required>
+        <option value="PERCENTAGE">Percentage</option>
+        <option value="FIXED">Fixed</option>
+    </select>
+
+    <label for="active">Active</label>
+    <select id="active" formControlName="active" required>
+        <option value="true">True</option>
+        <option value="false">False</option>
+    </select>
+
+    <label for="value">Value</label>
+    <input id="value" formControlName="value" type="number" required />
+
+    <button type="submit" [disabled]="!couponForm.valid">Add Coupon</button>
+</form>
