@@ -23,24 +23,24 @@ public class CouponService {
         this.couponHistoryRepository = couponHistoryRepository;
     }
 
+    public Coupon addCoupon(Coupon coupon) {
+        coupon.setAvailableUsages(coupon.getNumberOfUsages());
+        return couponRepository.save(coupon);
+    }
+
     public Page<Coupon> getAllCoupons(Pageable pageable) {
         return couponRepository.findAll(pageable);
     }
 
     public Coupon getSpecificCoupon(Long id) {
-
         return couponRepository.findById(id).orElse(null);
     }
 
-    public Coupon addCoupon(Coupon coupon) {
-        coupon.setAvailableUsages(coupon.getNumberOfUsages());
-        return couponRepository.save(coupon);
-    }
+
     public Coupon updateCoupon(Long id, Coupon newCoupon) {
          Coupon existingCoupon = couponRepository
                  .findById(id)
                  .orElseThrow(() -> new RuntimeException("Coupon not found with id " + id));
-
 
             if (newCoupon.getCode() != null && !newCoupon.getCode().equals(existingCoupon.getCode())) {
                 existingCoupon.setCode(newCoupon.getCode());
@@ -145,7 +145,9 @@ public class CouponService {
 
                 return new CouponResponse("Success", valueAfterDiscount,
                         "this order is sufficient to get the coupon");
-            }else{
+            }
+            else
+            {
                 if(!coupon.isActive()){
                     return new CouponResponse("Fail", request.amount(), "this coupon " + request.couponCode() + " is not active");
                 }
@@ -181,19 +183,15 @@ public class CouponService {
                 double discount = couponHistory.getValueBeforeDiscount() - couponHistory.getValueAfterDiscount();
                 CouponType couponType;
                 int value = (int) discount;
-                if(couponHistory.getValueBeforeDiscount() == couponHistory.getValueAfterDiscount() + 0.01 * discount*couponHistory.getValueBeforeDiscount()){
-                    couponType = CouponType.PERCENTAGE;
-                }
-                else{
-                    couponType = CouponType.FIXED;
-                }
-
+                couponType = CouponType.FIXED;
                 couponRepository.save(new Coupon(couponHistory.getCode(),
                         1,
                         1,
-                        Date.valueOf(LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonthValue()+1, LocalDate.now().getDayOfMonth())),
+                        Date.valueOf(LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonthValue()+1, 1)),
                         couponType, true, value));
-            }else{
+            }
+            else
+            {
                 Coupon coupon = requiredCoupon.get();
                 coupon.setActive(true);
                 coupon.setAvailableUsages(coupon.getAvailableUsages()+1);
